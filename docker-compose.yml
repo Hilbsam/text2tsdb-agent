@@ -1,0 +1,20 @@
+services:
+  chainlit:
+    # internal: keycloak on port 8080
+    build: .
+    container_name: chainlit
+    hostname: chainlit
+
+    restart: unless-stopped
+    environment:
+      VIRTUAL_HOST: 'chat.hilbsam.com'
+      VIRTUAL_PORT: '8000'
+      LETSENCRYPT_HOST: 'chat.hilbsam.com'
+    networks:
+      - default
+      - proxy
+
+networks:
+  proxy:
+    name: proxy
+  default:
