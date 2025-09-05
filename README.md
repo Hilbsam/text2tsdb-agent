@@ -14,7 +14,7 @@ Die Ausführbarkeit ist bei OpenAI am höchsten mit 98,02%, gefolgt von Gemma mi
 
 Open-Source-Modelle sind On-Premises grundsätzlich einsetzbar, weisen jedoch bei komplexeren Abfragen semantische Präzisionslücken auf. Ein vorgelagerter Validierungs-Agent und ein kuratiertes „SQL-Gedächtnis“ aus Gold-Abfragen sind geeignete Hebel, um Zusatz- und Auslasstreffer zu reduzieren, ohne Effizienz- und Interpretationsvorteile einzelner Modelle aufzugeben.
 
-![1757073127196](image/README/1757073127196.png)
+![Architektur des Multi-Agent](./images/Architektur.png)
 
 
 ## Struktur dieses Repos
