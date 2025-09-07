@@ -115,7 +115,6 @@ def main():
                                 "langfuse_session_id": "testing",
                             }
                         }
-                # do invoke until invoked_awnser is not None
                 invoked_awnser = None
                 while invoked_awnser is None:
                     try:
@@ -124,16 +123,12 @@ def main():
                     except Exception as e:
                         print(f"Error invoking graph for question {question} with model {model}: {e}")
                         continue
-                #invoked_awnser = graph.invoke({'question': question, 'data': goldendaten, 'config': config},
-                #                                     RunnableConfig(callbacks=[langfuse_handler], **config))['answer']
                 intrepretation.append(invoked_awnser)
                 df.at[i, model.capitalize() + 'Interpretation'] = invoked_awnser
         except Exception as e:
-            # print the error and skip the iteration
             print(f"Error invoking graph for question {question} with model {model}: {e}")
             df.at[i, model.capitalize() + 'Interpretation'] = None
             continue
-        # call the reasoning llm for each model
         mistral_score = []
         google_score = []
         openai_score = []
@@ -160,11 +155,7 @@ def main():
         df.at[i, 'OpenaiScore'] = sum(openai_score) / len(openai_score) if openai_score else None
         df.at[i, 'Reasoning'] = reasoning_scores
         # Speichern der Ergebnisse in einer Excel-Datei
-        df.to_excel("../questions/results_intrepretation.xlsx", index=False, engine='openpyxl')
-                    
-
-            
-
+        df.to_excel("../questions/results_intrepretation.xlsx", index=False, engine='openpyxl')         
 
 if __name__ == "__main__":
     load_dotenv('../app/.env')

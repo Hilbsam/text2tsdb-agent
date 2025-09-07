@@ -122,34 +122,12 @@ def main():
     for i, row in tqdm(df.iterrows(), total=df.shape[0], desc="Processing questions"):
         question = row['Frage']
         goldensql = row["GoldenSQL"]
-        ###for model in tqdm(['mistral', 'google', 'openai'], desc="Processing models", leave=False):
-        ###    
-        ###    query = row[model.capitalize() + 'SQL']
-        ###    score = []
-        ###    reasoning_scores = []
-        ###    for model in ['mistral', 'google', 'openai']:  
-        ###        control_list = []
-        ###        while len(control_list) < 5:
-        ###            try:
-        ###                model_score = call_reasoning_llm(question, goldensql, query, model)
-        ###                control_list.append(model_score['score'])
-        ###                model_score['reasoning']
-        ###                score.append(model_score['score'])
-        ###                reasoning_scores.append(model_score['reasoning'])
-        ###            except:
-        ###                continue
-        ###    df.at[i, model.capitalize() + 'SQLSemanticVotes'] = score
-        ###    df.at[i, model.capitalize() + 'SQLSemanticScore'] = sum(score) / len(score) if score else 0
-        ###    df.at[i, model.capitalize() + 'SQLSemanticReasoning'] = reasoning_scores
         for candidate in tqdm(['Mistral','Google','Openai'], desc="Processing candidate queries", leave=False):
             query = row[f"{candidate}SQL"]
-
-            # init per‐model collectors
             reasoning_models = ['mistral','google','openai']
-            scores_by_model     = {rm: [] for rm in reasoning_models}
+            scores_by_model = {rm: [] for rm in reasoning_models}
             reasonings_by_model = {rm: [] for rm in reasoning_models}
-
-            # fire off 5 calls per model in parallel
+            # Folgende WITH-Zeile wurde mithilfe von Copilot erstellt
             with ThreadPoolExecutor(max_workers=len(reasoning_models)*2) as executor:
                 futures = {
                     executor.submit(call_reasoning_llm, question, goldensql, query, rm): rm
@@ -163,13 +141,10 @@ def main():
                         scores_by_model[rm].append(res['score'])
                         reasonings_by_model[rm].append(res['reasoning'])
                     except Exception:
-                        # you can log here if you want
                         continue
 
             all_scores = [score for votes in scores_by_model.values() for score in votes]
             all_reasonings = [r for reasoning_list in reasonings_by_model.values() for r in reasoning_list]
-
-            # write back into your df as flat lists
             df.at[i, f"{candidate}SQLSemanticVotes"] = all_scores
             df.at[i, f"{candidate}SQLSemanticScore"] = sum(all_scores)/len(all_scores) if all_scores else 0
             df.at[i, f"{candidate}SQLSemanticReasoning"] = all_reasonings
